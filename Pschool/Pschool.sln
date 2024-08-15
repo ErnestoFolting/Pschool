@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolFrontend", "PschoolFrontend\PschoolFrontend.csproj", "{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolBackend", "PschoolBackend\PschoolBackend.csproj", "{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FFF8F32-C183-4406-AEDE-C49547022E94}
+	EndGlobalSection
+EndGlobal

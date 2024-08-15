@@ -1,0 +1,6 @@
+@PschoolBackend_HostAddress = http://localhost:5282
+
+GET {{PschoolBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
