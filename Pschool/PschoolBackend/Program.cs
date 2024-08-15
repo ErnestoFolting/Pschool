@@ -1,3 +1,5 @@
+global using Microsoft.EntityFrameworkCore;
+using PschoolBackend_DAL;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +14,12 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod();
         }); 
 });
+
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
