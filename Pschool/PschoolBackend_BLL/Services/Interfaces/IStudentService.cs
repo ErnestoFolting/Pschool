@@ -1,5 +1,4 @@
 ﻿using PschoolBackend_BLL.DTOs;
-using PschoolBackend_DAL.Entities;
 
 namespace PschoolBackend_BLL.Services.Interfaces
 {
@@ -7,7 +6,7 @@ namespace PschoolBackend_BLL.Services.Interfaces
     {
         Task addStudent(StudentDTO studentToAdd);
         Task deleteStudent(int studentId);
-        public Task<List<Student>> getStudents();
-        Task<int> updateStudent(StudentRedoDTO updateData);
+        public Task<List<StudentRedoDTO>> getStudents();
+        Task<int> updateStudent(StudentRedoDTO updateData, int studentId);
     }
 }

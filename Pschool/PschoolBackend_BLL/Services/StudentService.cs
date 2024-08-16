@@ -14,9 +14,9 @@ namespace PschoolBackend_BLL.Services
             
         }
 
-        public async Task<List<Student>> getStudents()
+        public async Task<List<StudentRedoDTO>> getStudents()
         {
-            var students = await _unitOfWork.StudentRepository.GetAll();
+            var students =_mapper.Map<List<StudentRedoDTO>> (await _unitOfWork.StudentRepository.GetAll());
             return students;
         }
 
@@ -34,9 +34,9 @@ namespace PschoolBackend_BLL.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<int> updateStudent(StudentRedoDTO updateData)
+        public async Task<int> updateStudent(StudentRedoDTO updateData, int studentId)
         {
-            var studentInDb = await _unitOfWork.StudentRepository.GetById(updateData.Id);
+            var studentInDb = await _unitOfWork.StudentRepository.GetById(studentId);
             if (studentInDb == null) throw new KeyNotFoundException("Student not found.");
 
             studentInDb = _mapper.Map(updateData, studentInDb);

@@ -14,7 +14,7 @@ namespace PschoolBackend_DAL.Repositories
 
         public async Task<List<Student>> GetAll()
         {
-            return await _context.Set<Student>().ToListAsync();
+            return await _context.Set<Student>().Include(s=>s.ParentCouple).ToListAsync();
         }
 
         public async Task Add(Student studentToAdd)

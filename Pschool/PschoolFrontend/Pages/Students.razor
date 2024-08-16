@@ -1,10 +1,57 @@
 ﻿@page "/students"
+@using PschoolFrontend.Pages.Entities
 @inject HttpClient Http
 
 <PageTitle>Students</PageTitle>
 
 <h3>Students</h3>
-@if (forecasts == null)
+
+<div class="card p-3 my-4">
+    <h4>Create New Student</h4>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input @bind="newStudent.FirstName" class="form-control" placeholder="First Name" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newStudent.LastName" class="form-control" placeholder="Last Name" />
+        </div>
+        <div class="col-md-2">
+            <input @bind="newStudent.Age" class="form-control" placeholder="Age" type="number" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newStudent.ParentCoupleId" class="form-control" placeholder="ParentCoupleId" type="number" />
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100" @onclick="CreateStudent">Create</button>
+        </div>
+    </div>
+</div>
+
+@if (selectedStudent != null)
+{
+    <div class="card p-3 my-4">
+        <h4>Update Student</h4>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <input @bind="selectedStudent.FirstName" class="form-control" placeholder="First Name" />
+            </div>
+            <div class="col-md-3">
+                <input @bind="selectedStudent.LastName" class="form-control" placeholder="Last Name" />
+            </div>
+            <div class="col-md-2">
+                <input @bind="selectedStudent.Age" class="form-control" placeholder="Age" type="number" />
+            </div>
+            <div class="col-md-3">
+                <input @bind="selectedStudent.ParentCoupleId" class="form-control" placeholder="ParentCoupleId" type="number" />
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-success w-100" @onclick="UpdateStudent">Update</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (students == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -13,51 +60,146 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>TemperatureC</th>
-                <th>TemperatureF</th>
-                <th>Summary</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Parents Name</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var student in students)
             {
                 <tr>
-                    <td>@forecast.Date</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@student.FirstName</td>
+                    <td>@student.LastName</td>
+                    <td>@student.Age</td>
+                    <td>@student.ParentCouple?.FamilyName</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditStudent(student)">
+                            <span>&#9998;</span>
+                        </button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteStudent(student.Id)">
+                            <span>&times;</span>
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+@if (error != "")
+{
+    <h3>Error: @error</h3>
+}
+
+@if (isLoading)
+{
+    <h3>Loading...</h3>
+}
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private Student[]? students;
+    private string error = "";
+    private bool isLoading = false;
+    private Student newStudent = new Student();
+    private Student? selectedStudent = null; // The student currently being edited
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadStudents();
+    }
+
+    private async Task LoadStudents()
+    {
+        isLoading = true;
         try
         {
-            forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("https://localhost:7081/WeatherForecast");
+            students = await Http.GetFromJsonAsync<Student[]>("https://localhost:7081/api/students");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            error = e.Message;
         }
+        isLoading = false;
     }
 
-    public class WeatherForecast
+    private async Task CreateStudent()
     {
-        public DateOnly Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        isLoading = true;
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7081/api/students", newStudent);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadStudents();
+                newStudent = new Student(); // Clear the form
+                error = "";
+            }
+            else
+            {
+                error = response.StatusCode.ToString();
+            }
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
     }
 
+    private async Task DeleteStudent(int id)
+    {
+        isLoading = true;
+        try
+        {
+            var response = await Http.DeleteAsync($"https://localhost:7081/api/students/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadStudents();
+                error = "";
+            }
+            else
+            {
+                error = response.StatusCode.ToString();
+            }
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
+    }
+
+    private void EditStudent(Student student)
+    {
+        selectedStudent = student;
+    }
+
+    private async Task UpdateStudent()
+    {
+        if (selectedStudent == null) return;
+
+        isLoading = true;
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"https://localhost:7081/api/students/{selectedStudent.Id}", selectedStudent);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadStudents();
+                selectedStudent = null; // Clear the form
+                error = "";
+            }
+            else
+            {
+                error = response.StatusCode.ToString();
+            }
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
+    }
 }

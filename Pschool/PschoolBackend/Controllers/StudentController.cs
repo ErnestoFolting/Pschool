@@ -16,22 +16,22 @@ namespace PschoolBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Student>> Get()
+        public async Task<IEnumerable<StudentRedoDTO>> Get()
         {
             return await _studentService.getStudents();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromForm] StudentDTO studentToAdd)
+        public async Task<ActionResult> Post(StudentDTO studentToAdd)
         {
             await _studentService.addStudent(studentToAdd);
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Update([FromForm] StudentRedoDTO updateData)
+        [HttpPut("{studentId}")]
+        public async Task<ActionResult> Update(StudentRedoDTO updateData, int studentId)
         {
-            await _studentService.updateStudent(updateData);
+            await _studentService.updateStudent(updateData, studentId);
             return Ok();
         }
 
