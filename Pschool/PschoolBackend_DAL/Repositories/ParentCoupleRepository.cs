@@ -15,5 +15,9 @@ namespace PschoolBackend_DAL.Repositories
         {
             return await _context.Set<ParentCouple>().ToListAsync();
         }
+        public async Task Add(ParentCouple parentCoupleToAdd)
+        {
+            await _context.Set<ParentCouple>().AddAsync(parentCoupleToAdd);
+        }
     }
 }

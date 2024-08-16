@@ -6,6 +6,7 @@
 
 <h3>Parents</h3>
 
+<!-- Create New Parent -->
 <div class="card p-3 my-4">
     <h4>Create New Parent</h4>
     <div class="row g-3">
@@ -39,6 +40,44 @@
     </div>
 </div>
 
+<!-- Create New Parent Couple -->
+<div class="card p-3 my-4">
+    <h4>Create New Parent Couple</h4>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input @bind="newParentCouple.FamilyName" class="form-control" placeholder="Family Name" />
+        </div>
+        <div class="col-md-3">
+            <select @bind="newParentCouple.Parent1Id" class="form-control">
+                <option value="">Select Parent 1</option>
+                @if (availableParents != null)
+                {
+                    @foreach (var parent in availableParents)
+                    {
+                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select @bind="newParentCouple.Parent2Id" class="form-control">
+                <option value="">Select Parent 2</option>
+                @if (availableParents != null)
+                {
+                    @foreach (var parent in availableParents)
+                    {
+                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100" @onclick="CreateParentCouple">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Parent List -->
 @if (parents == null)
 {
     <p><em>Loading...</em></p>
@@ -121,10 +160,12 @@ else
 
 @code {
     private Parent[]? parents;
+    private ParentCouple newParentCouple = new ParentCouple();
+    private Parent? editingParent = null;
+    private Parent newParent = new Parent();
     private string error = "";
     private bool isLoading = false;
-    private Parent newParent = new Parent();
-    private Parent? editingParent = null;
+    private Parent[]? availableParents;
 
     protected override async Task OnInitializedAsync()
     {
@@ -143,6 +184,7 @@ else
             error = e.Message;
         }
         isLoading = false;
+        availableParents = parents.Where(el => el.ParentCouple == null).ToArray();
     }
 
     private async Task CreateParent()
@@ -195,17 +237,17 @@ else
     private void EditParent(Parent parent)
     {
         editingParent = new Parent
-            {
-                Id = parent.Id,
-                FirstName = parent.FirstName,
-                LastName = parent.LastName,
-                Username = parent.Username,
-                Email = parent.Email,
-                HomeAddress = parent.HomeAddress,
-                Phone = parent.Phone,
-                WorkPhone = parent.WorkPhone,
-                HomePhone = parent.HomePhone
-            };
+        {
+            Id = parent.Id,
+            FirstName = parent.FirstName,
+            LastName = parent.LastName,
+            Username = parent.Username,
+            Email = parent.Email,
+            HomeAddress = parent.HomeAddress,
+            Phone = parent.Phone,
+            WorkPhone = parent.WorkPhone,
+            HomePhone = parent.HomePhone
+        };
     }
 
     private async Task SaveParent()
@@ -237,5 +279,34 @@ else
     private void CancelEdit()
     {
         editingParent = null;
+    }
+    private async Task CreateParentCouple()
+    {
+        isLoading = true;
+        if(newParentCouple.Parent1Id == newParentCouple.Parent2Id)
+        {
+            error = "Select distinct parents";
+            isLoading = false;
+            return;
+        }
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parentcouples", newParentCouple);
+            if (response.IsSuccessStatusCode)
+            {
+                newParentCouple = new ParentCouple();
+                await LoadParents(); // Reload parents to reflect any changes
+                error = "";
+            }
+            else
+            {
+                error = response.StatusCode.ToString();
+            }
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
     }
 }
