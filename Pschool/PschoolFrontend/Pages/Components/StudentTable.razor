@@ -1,0 +1,80 @@
+﻿@using PschoolFrontend.Pages.Entities
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Parents Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Students != null)
+        {
+            @foreach (var student in Students)
+            {
+                <tr>
+                    @if (EditingStudent?.Id == student.Id)
+                    {
+                        <td><input @bind="EditingStudent.FirstName" class="form-control" /></td>
+                        <td><input @bind="EditingStudent.LastName" class="form-control" /></td>
+                        <td><input @bind="EditingStudent.Age" class="form-control" type="number" /></td>
+                        <td>@student.ParentCouple?.FamilyName</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" @onclick="SaveStudent">Save</button>
+                            <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@student.FirstName</td>
+                        <td>@student.LastName</td>
+                        <td>@student.Age</td>
+                        <td>@student.ParentCouple?.FamilyName</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => EditStudent(student)">
+                                <span>&#9998;</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteStudent(student.Id)">
+                                <span>&times;</span>
+                            </button>
+                        </td>
+                    }
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public Student[] Students { get; set; } = Array.Empty<Student>();
+    [Parameter] public Student? EditingStudent { get; set; }
+    [Parameter] public EventCallback<Student> OnEditStudent { get; set; }
+    [Parameter] public EventCallback OnSaveStudent { get; set; }
+    [Parameter] public EventCallback OnCancelEdit { get; set; }
+    [Parameter] public EventCallback<int> OnDeleteStudent { get; set; }
+
+    private async Task EditStudent(Student student)
+    {
+        await OnEditStudent.InvokeAsync(student);
+    }
+
+    private async Task SaveStudent()
+    {
+        await OnSaveStudent.InvokeAsync();
+    }
+
+    private async Task CancelEdit()
+    {
+        await OnCancelEdit.InvokeAsync();
+    }
+
+    private async Task DeleteStudent(int id)
+    {
+        await OnDeleteStudent.InvokeAsync(id);
+    }
+}

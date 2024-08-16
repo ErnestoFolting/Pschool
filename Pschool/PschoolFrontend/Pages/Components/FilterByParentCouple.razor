@@ -1,0 +1,36 @@
+﻿@using PschoolFrontend.Pages.Entities
+
+<div class="card p-3 my-4">
+    <h4>Filter by parents</h4>
+    <div class="row g-3">
+        <div class="col-md-12">
+            <select class="form-control" @onchange="OnChange">
+                <option value="">All</option>
+                @if (ParentCouples != null)
+                {
+                    @foreach (var couple in ParentCouples)
+                    {
+                        <option value="@couple.Id">@couple.FamilyName (Parent 1: @couple.Parent1Id, Parent 2: @couple.Parent2Id)</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ParentCouple[]? ParentCouples { get; set; }
+    [Parameter] public EventCallback<int?> OnParentCoupleChanged { get; set; }
+
+    private void OnChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var selectedId))
+        {
+            OnParentCoupleChanged.InvokeAsync(selectedId);
+        }
+        else
+        {
+            OnParentCoupleChanged.InvokeAsync(null);
+        }
+    }
+}

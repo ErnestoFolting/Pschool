@@ -1,0 +1,64 @@
+﻿@using PschoolFrontend.Pages.Entities
+@inject HttpClient Http
+
+<div class="card p-3 my-4">
+    <h4>Create new student</h4>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input @bind="newStudent.FirstName" class="form-control" placeholder="First Name" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newStudent.LastName" class="form-control" placeholder="Last Name" />
+        </div>
+        <div class="col-md-2">
+            <input @bind="newStudent.Age"
+                   class="form-control"
+                   placeholder="Age"
+                   type="number"
+                   min="0"
+                   step="1"
+                   oninput="this.value = Math.abs(this.value)" />
+        </div>
+        <div class="col-md-3">
+            <select @bind="newStudent.ParentCoupleId" class="form-control">
+                <option value="">Select parents</option>
+                @if (parentCouples != null)
+                {
+                    @foreach (var couple in parentCouples)
+                    {
+                        <option value="@couple.Id">@couple.FamilyName (Parent1: @couple.Parent1Id, Parent2: @couple.Parent2Id)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100" @onclick="CreateStudent">Create</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnStudentCreated { get; set; }
+
+    private Student newStudent = new Student();
+    private ParentCouple[]? parentCouples;
+
+    protected override async Task OnInitializedAsync()
+    {
+        parentCouples = await Http.GetFromJsonAsync<ParentCouple[]>("https://localhost:7081/api/parentcouples");
+    }
+
+    private async Task CreateStudent()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7081/api/students", newStudent);
+        if (response.IsSuccessStatusCode)
+        {
+            await OnStudentCreated.InvokeAsync();
+            newStudent = new Student(); // Reset form
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+}
