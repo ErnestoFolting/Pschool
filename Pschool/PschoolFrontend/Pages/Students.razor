@@ -7,7 +7,7 @@
 <h3>Students</h3>
 
 <div class="card p-3 my-4">
-    <h4>Create New Student</h4>
+    <h4>Create new student</h4>
     <div class="row g-3">
         <div class="col-md-3">
             <input @bind="newStudent.FirstName" class="form-control" placeholder="First Name" />
@@ -16,10 +16,27 @@
             <input @bind="newStudent.LastName" class="form-control" placeholder="Last Name" />
         </div>
         <div class="col-md-2">
-            <input @bind="newStudent.Age" class="form-control" placeholder="Age" type="number" />
-        </div>
+    <input 
+        @bind="newStudent.Age" 
+        class="form-control" 
+        placeholder="Age" 
+        type="number" 
+        min="0" 
+        step="1" 
+        oninput="this.value = Math.abs(this.value)" 
+    />
+</div>
         <div class="col-md-3">
-            <input @bind="newStudent.ParentCoupleId" class="form-control" placeholder="ParentCoupleId" type="number" />
+            <select @bind="newStudent.ParentCoupleId" class="form-control">
+                <option value="">Select parents</option>
+                @if (parentCouples != null)
+                {
+                    @foreach (var couple in parentCouples)
+                    {
+                        <option value="@couple.Id">@couple.FamilyName (Parent1: @couple.Parent1Id, Parent2: @couple.Parent2Id)</option>
+                    }
+                }
+            </select>
         </div>
         <div class="col-md-1">
             <button class="btn btn-primary w-100" @onclick="CreateStudent">Create</button>
@@ -27,29 +44,23 @@
     </div>
 </div>
 
-@if (selectedStudent != null)
-{
-    <div class="card p-3 my-4">
-        <h4>Update Student</h4>
-        <div class="row g-3">
-            <div class="col-md-3">
-                <input @bind="selectedStudent.FirstName" class="form-control" placeholder="First Name" />
-            </div>
-            <div class="col-md-3">
-                <input @bind="selectedStudent.LastName" class="form-control" placeholder="Last Name" />
-            </div>
-            <div class="col-md-2">
-                <input @bind="selectedStudent.Age" class="form-control" placeholder="Age" type="number" />
-            </div>
-            <div class="col-md-3">
-                <input @bind="selectedStudent.ParentCoupleId" class="form-control" placeholder="ParentCoupleId" type="number" />
-            </div>
-            <div class="col-md-1">
-                <button class="btn btn-success w-100" @onclick="UpdateStudent">Update</button>
-            </div>
+<div class="card p-3 my-4">
+    <h4>Filter by parents</h4>
+    <div class="row g-3">
+        <div class="col-md-12">
+            <select class="form-control" @onchange="OnParentCoupleChanged">
+                <option value="">All</option>
+                @if (parentCouples != null)
+                {
+                    @foreach (var couple in parentCouples)
+                    {
+                        <option value="@couple.Id">@couple.FamilyName (parent 1: @couple.Parent1Id, parent2: @couple.Parent2Id)</option>
+                    }
+                }
+            </select>
         </div>
     </div>
-}
+</div>
 
 @if (students == null)
 {
@@ -68,21 +79,35 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var student in students)
+            @foreach (var student in filteredStudents)
             {
                 <tr>
-                    <td>@student.FirstName</td>
-                    <td>@student.LastName</td>
-                    <td>@student.Age</td>
-                    <td>@student.ParentCouple?.FamilyName</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" @onclick="() => EditStudent(student)">
-                            <span>&#9998;</span>
-                        </button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteStudent(student.Id)">
-                            <span>&times;</span>
-                        </button>
-                    </td>
+                    @if (editingStudent?.Id == student.Id)
+                    {
+                        <td><input @bind="editingStudent.FirstName" class="form-control" /></td>
+                        <td><input @bind="editingStudent.LastName" class="form-control" /></td>
+                        <td><input @bind="editingStudent.Age" class="form-control" type="number" /></td>
+                        <td>@student.ParentCouple?.FamilyName</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" @onclick="SaveStudent">Save</button>
+                            <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@student.FirstName</td>
+                        <td>@student.LastName</td>
+                        <td>@student.Age</td>
+                        <td>@student.ParentCouple?.FamilyName</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => EditStudent(student)">
+                                <span>&#9998;</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteStudent(student.Id)">
+                                <span>&times;</span>
+                            </button>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
@@ -101,13 +126,17 @@ else
 
 @code {
     private Student[]? students;
+    private Student[]? filteredStudents;
     private string error = "";
     private bool isLoading = false;
     private Student newStudent = new Student();
-    private Student? selectedStudent = null; // The student currently being edited
+    private Student? editingStudent = null;
+    private int? selectedParentCoupleId;
+    private ParentCouple[]? parentCouples;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadParentCouples();
         await LoadStudents();
     }
 
@@ -117,6 +146,21 @@ else
         try
         {
             students = await Http.GetFromJsonAsync<Student[]>("https://localhost:7081/api/students");
+            FilterStudents();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
+    }
+
+    private async Task LoadParentCouples()
+    {
+        isLoading = true;
+        try
+        {
+            parentCouples = await Http.GetFromJsonAsync<ParentCouple[]>("https://localhost:7081/api/parentcouples");
         }
         catch (Exception e)
         {
@@ -134,7 +178,7 @@ else
             if (response.IsSuccessStatusCode)
             {
                 await LoadStudents();
-                newStudent = new Student(); // Clear the form
+                newStudent = new Student();
                 error = "";
             }
             else
@@ -174,21 +218,29 @@ else
 
     private void EditStudent(Student student)
     {
-        selectedStudent = student;
+        editingStudent = new Student
+            {
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Age = student.Age,
+                ParentCoupleId = student.ParentCoupleId,
+                ParentCouple = student.ParentCouple
+            };
     }
 
-    private async Task UpdateStudent()
+    private async Task SaveStudent()
     {
-        if (selectedStudent == null) return;
+        if (editingStudent == null) return;
 
         isLoading = true;
         try
         {
-            var response = await Http.PutAsJsonAsync($"https://localhost:7081/api/students/{selectedStudent.Id}", selectedStudent);
+            var response = await Http.PutAsJsonAsync($"https://localhost:7081/api/students/{editingStudent.Id}", editingStudent);
             if (response.IsSuccessStatusCode)
             {
                 await LoadStudents();
-                selectedStudent = null; // Clear the form
+                editingStudent = null; // Clear the editing form
                 error = "";
             }
             else
@@ -201,5 +253,38 @@ else
             error = e.Message;
         }
         isLoading = false;
+    }
+
+    private void CancelEdit()
+    {
+        editingStudent = null;
+    }
+
+    private void OnParentCoupleChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var selectedId))
+        {
+            selectedParentCoupleId = selectedId;
+        }
+        else
+        {
+            selectedParentCoupleId = null;
+        }
+
+        FilterStudents();
+    }
+
+    private void FilterStudents()
+    {
+        if (students == null) return;
+
+        if (selectedParentCoupleId.HasValue)
+        {
+            filteredStudents = students.Where(s => s.ParentCoupleId == selectedParentCoupleId.Value).ToArray();
+        }
+        else
+        {
+            filteredStudents = students;
+        }
     }
 }

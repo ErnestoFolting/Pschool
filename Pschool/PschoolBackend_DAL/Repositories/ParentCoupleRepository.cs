@@ -1,4 +1,6 @@
-﻿using PschoolBackend_DAL.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using PschoolBackend_DAL.Entities;
+using PschoolBackend_DAL.Interfaces;
 
 namespace PschoolBackend_DAL.Repositories
 {
@@ -8,6 +10,10 @@ namespace PschoolBackend_DAL.Repositories
         public ParentCoupleRepository(DataContext context)
         {
             _context = context;
+        }
+        public async Task<List<ParentCouple>> GetAll()
+        {
+            return await _context.Set<ParentCouple>().ToListAsync();
         }
     }
 }
