@@ -35,6 +35,10 @@
             <button class="btn btn-primary w-100" @onclick="CreateStudent">Create</button>
         </div>
     </div>
+    @if (error != "")
+    {
+        <h3 style="color:darkred">Error: @error</h3>
+    }
 </div>
 
 @code {
@@ -42,6 +46,7 @@
 
     private Student newStudent = new Student();
     private ParentCouple[]? parentCouples;
+    private string error = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,10 +60,11 @@
         {
             await OnStudentCreated.InvokeAsync();
             newStudent = new Student(); // Reset form
+            error = "";
         }
         else
         {
-            // Handle error
+            error = response.StatusCode.ToString();
         }
     }
 }
