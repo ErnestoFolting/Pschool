@@ -8,6 +8,7 @@ namespace PschoolBackend_BLL.DTOs.MappingProfiles
         public StudentProfile()
         {
             CreateMap<StudentDTO, Student>();
+            CreateMap<Student, StudentDTO>();
         }
     }
 }
