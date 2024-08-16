@@ -1,4 +1,5 @@
-﻿@using PschoolFrontend.Pages.Entities
+﻿@page "/create-parent"
+@using PschoolFrontend.Pages.Entities
 @inject HttpClient Http
 
 <div class="card p-3 my-4">
@@ -44,8 +45,18 @@
     private Parent newParent = new Parent();
     private string error = "";
 
+    private const string PhonePattern = @"^\+?[0-9\s\-\(\)]+$"; // Regex pattern for phone numbers
+    private const string EmailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // Regex pattern for email addresses
+
     private async Task CreateParent()
     {
+        // Validate inputs
+        error = ValidateParent(newParent);
+        if (!string.IsNullOrEmpty(error))
+        {
+            return;
+        }
+
         var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parents", newParent);
         if (response.IsSuccessStatusCode)
         {
@@ -57,5 +68,30 @@
         {
             error = response.StatusCode.ToString();
         }
+    }
+
+    private string ValidateParent(Parent parent)
+    {
+        // Validate email
+        if (string.IsNullOrEmpty(parent.Email) || !System.Text.RegularExpressions.Regex.IsMatch(parent.Email, EmailPattern))
+        {
+            return "Invalid email format.";
+        }
+
+        // Validate phone numbers
+        if (string.IsNullOrEmpty(parent.Phone) || !System.Text.RegularExpressions.Regex.IsMatch(parent.Phone, PhonePattern))
+        {
+            return "Invalid phone number format.";
+        }
+        if (string.IsNullOrEmpty(parent.WorkPhone) || !System.Text.RegularExpressions.Regex.IsMatch(parent.WorkPhone, PhonePattern))
+        {
+            return "Invalid work phone number format.";
+        }
+        if (string.IsNullOrEmpty(parent.HomePhone) || !System.Text.RegularExpressions.Regex.IsMatch(parent.HomePhone, PhonePattern))
+        {
+            return "Invalid home phone number format.";
+        }
+
+        return "";
     }
 }
