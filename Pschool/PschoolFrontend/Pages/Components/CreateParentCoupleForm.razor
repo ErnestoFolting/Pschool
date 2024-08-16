@@ -1,0 +1,75 @@
+﻿@using PschoolFrontend.Pages.Entities
+@inject HttpClient Http
+
+<div class="card p-3 my-4">
+    <h4>Create New Parent Couple</h4>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input @bind="newParentCouple.FamilyName" class="form-control" placeholder="Family name" />
+        </div>
+        <div class="col-md-3">
+            <select @bind="newParentCouple.Parent1Id" class="form-control">
+                <option value="">Select free parent</option>
+                @if (AvailableParents != null)
+                {
+                    @foreach (var parent in AvailableParents)
+                    {
+                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select @bind="newParentCouple.Parent2Id" class="form-control">
+                <option value="">Select free parent</option>
+                @if (AvailableParents != null)
+                {
+                    @foreach (var parent in AvailableParents)
+                    {
+                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100" @onclick="CreateParentCouple">Create</button>
+        </div>
+    </div>
+    @if (error != "")
+    {
+        <h3 style="color:darkred">Error: @error</h3>
+    }
+</div>
+
+
+
+@code {
+
+    [Parameter] public Parent[]? AvailableParents { get; set; }
+    [Parameter] public EventCallback OnParentCoupleCreated { get; set; }
+    private string error = "";
+
+
+    private ParentCouple newParentCouple = new ParentCouple();
+
+    private async Task CreateParentCouple()
+    {
+        if (newParentCouple.Parent1Id == newParentCouple.Parent2Id)
+        {
+            error = "Select distinct parents.";
+            return;
+        }
+
+        var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parentcouples", newParentCouple);
+        if (response.IsSuccessStatusCode)
+        {
+            await OnParentCoupleCreated.InvokeAsync();
+            newParentCouple = new ParentCouple(); // Reset form
+        }
+        else
+        {
+            // Handle error
+        }
+        error = "";
+    }
+}

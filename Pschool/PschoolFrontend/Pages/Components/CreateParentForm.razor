@@ -1,0 +1,61 @@
+﻿@using PschoolFrontend.Pages.Entities
+@inject HttpClient Http
+
+<div class="card p-3 my-4">
+    <h4>Create New Parent</h4>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <input @bind="newParent.FirstName" class="form-control" placeholder="First Name" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.LastName" class="form-control" placeholder="Last Name" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.Username" class="form-control" placeholder="Username" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.Email" class="form-control" placeholder="Email" type="email" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.HomeAddress" class="form-control" placeholder="Home Address" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.Phone" class="form-control" placeholder="Phone" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.WorkPhone" class="form-control" placeholder="Work Phone" />
+        </div>
+        <div class="col-md-3">
+            <input @bind="newParent.HomePhone" class="form-control" placeholder="Home Phone" />
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary w-100" @onclick="CreateParent">Create</button>
+        </div>
+    </div>
+    @if (error != "")
+    {
+        <h3 style="color:darkred">Error: @error</h3>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback OnParentCreated { get; set; }
+
+    private Parent newParent = new Parent();
+    private string error = "";
+
+    private async Task CreateParent()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parents", newParent);
+        if (response.IsSuccessStatusCode)
+        {
+            await OnParentCreated.InvokeAsync();
+            newParent = new Parent(); // Reset form
+            error = "";
+        }
+        else
+        {
+            error = response.StatusCode.ToString();
+        }
+    }
+}

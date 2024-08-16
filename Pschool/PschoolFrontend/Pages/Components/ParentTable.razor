@@ -1,0 +1,102 @@
+﻿@using PschoolFrontend.Pages.Entities
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>HomeAddress</th>
+            <th>Phone</th>
+            <th>WorkPhone</th>
+            <th>HomePhone</th>
+            <th>Couple Id</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Parents != null)
+        {
+            @foreach (var parent in Parents)
+            {
+                <tr>
+                    @if (EditingParent?.Id == parent.Id)
+                    {
+                        <td><input @bind="EditingParent.FirstName" class="form-control" /></td>
+                        <td><input @bind="EditingParent.LastName" class="form-control" /></td>
+                        <td><input @bind="EditingParent.Username" class="form-control" /></td>
+                        <td><input @bind="EditingParent.Email" class="form-control" type="email" /></td>
+                        <td><input @bind="EditingParent.HomeAddress" class="form-control" /></td>
+                        <td><input @bind="EditingParent.Phone" class="form-control" /></td>
+                        <td><input @bind="EditingParent.WorkPhone" class="form-control" /></td>
+                        <td><input @bind="EditingParent.HomePhone" class="form-control" /></td>
+                        <td>
+                            <button class="btn btn-success btn-sm" @onclick="SaveParent">Save</button>
+                            <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>@parent.FirstName</td>
+                        <td>@parent.LastName</td>
+                        <td>@parent.Username</td>
+                        <td>@parent.Email</td>
+                        <td>@parent.HomeAddress</td>
+                        <td>@parent.Phone</td>
+                        <td>@parent.WorkPhone</td>
+                        <td>@parent.HomePhone</td>
+                        @if (parent.ParentCouple != null)
+                        {
+                            <td>@parent.ParentCouple.Id</td>
+                        }
+                        else
+                        {
+                            <td>-</td>
+                        }
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => EditParent(parent)">
+                                <span>&#9998;</span>
+                            </button>
+                            @if (parent.ParentCouple == null)
+                            {
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteParent(parent.Id)">
+                                    <span>&times;</span>
+                                </button>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public Parent[] Parents { get; set; } = Array.Empty<Parent>();
+    [Parameter] public Parent? EditingParent { get; set; }
+    [Parameter] public EventCallback<Parent> OnEditParent { get; set; }
+    [Parameter] public EventCallback OnSaveParent { get; set; }
+    [Parameter] public EventCallback OnCancelEdit { get; set; }
+    [Parameter] public EventCallback<int> OnDeleteParent { get; set; }
+
+    private async Task EditParent(Parent parent)
+    {
+        await OnEditParent.InvokeAsync(parent);
+    }
+
+    private async Task SaveParent()
+    {
+        await OnSaveParent.InvokeAsync();
+    }
+
+    private async Task CancelEdit()
+    {
+        await OnCancelEdit.InvokeAsync();
+    }
+
+    private async Task DeleteParent(int id)
+    {
+        await OnDeleteParent.InvokeAsync(id);
+    }
+}

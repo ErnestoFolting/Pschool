@@ -1,4 +1,5 @@
 ﻿@page "/parents"
+@using PschoolFrontend.Pages.Components
 @using PschoolFrontend.Pages.Entities
 @inject HttpClient Http
 
@@ -7,150 +8,13 @@
 <h3>Parents</h3>
 
 <!-- Create New Parent -->
-<div class="card p-3 my-4">
-    <h4>Create New Parent</h4>
-    <div class="row g-3">
-        <div class="col-md-3">
-            <input @bind="newParent.FirstName" class="form-control" placeholder="First Name" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.LastName" class="form-control" placeholder="Last Name" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.Username" class="form-control" placeholder="Username" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.Email" class="form-control" placeholder="Email" type="email" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.HomeAddress" class="form-control" placeholder="Home Address" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.Phone" class="form-control" placeholder="Phone" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.WorkPhone" class="form-control" placeholder="Work Phone" />
-        </div>
-        <div class="col-md-3">
-            <input @bind="newParent.HomePhone" class="form-control" placeholder="Home Phone" />
-        </div>
-        <div class="col-md-1">
-            <button class="btn btn-primary w-100" @onclick="CreateParent">Create</button>
-        </div>
-    </div>
-</div>
+<CreateParentForm OnParentCreated="HandleParentCreated" />
 
 <!-- Create New Parent Couple -->
-<div class="card p-3 my-4">
-    <h4>Create New Parent Couple</h4>
-    <div class="row g-3">
-        <div class="col-md-3">
-            <input @bind="newParentCouple.FamilyName" class="form-control" placeholder="Family name" />
-        </div>
-        <div class="col-md-3">
-            <select @bind="newParentCouple.Parent1Id" class="form-control">
-                <option value="">Select free parent</option>
-                @if (availableParents != null)
-                {
-                    @foreach (var parent in availableParents)
-                    {
-                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
-            <select @bind="newParentCouple.Parent2Id" class="form-control">
-                <option value="">Select free parent</option>
-                @if (availableParents != null)
-                {
-                    @foreach (var parent in availableParents)
-                    {
-                        <option value="@parent.Id">@parent.FirstName @parent.LastName</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-1">
-            <button class="btn btn-primary w-100" @onclick="CreateParentCouple">Create</button>
-        </div>
-    </div>
-</div>
+<CreateParentCoupleForm AvailableParents="availableParents" OnParentCoupleCreated="HandleParentCoupleCreated" />
 
-<!-- Parent List -->
-@if (parents == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>HomeAddress</th>
-                <th>Phone</th>
-                <th>WorkPhone</th>
-                <th>HomePhone</th>
-                <th>Couple Id</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var parent in parents)
-            {
-                <tr>
-                    @if (editingParent?.Id == parent.Id)
-                    {
-                        <td><input @bind="editingParent.FirstName" class="form-control" /></td>
-                        <td><input @bind="editingParent.LastName" class="form-control" /></td>
-                        <td><input @bind="editingParent.Username" class="form-control" /></td>
-                        <td><input @bind="editingParent.Email" class="form-control" type="email" /></td>
-                        <td><input @bind="editingParent.HomeAddress" class="form-control" /></td>
-                        <td><input @bind="editingParent.Phone" class="form-control" /></td>
-                        <td><input @bind="editingParent.WorkPhone" class="form-control" /></td>
-                        <td><input @bind="editingParent.HomePhone" class="form-control" /></td>
-                        <td>
-                            <button class="btn btn-success btn-sm" @onclick="SaveParent">Save</button>
-                            <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
-                        </td>
-                    }
-                    else
-                    {
-                        <td>@parent.FirstName</td>
-                        <td>@parent.LastName</td>
-                        <td>@parent.Username</td>
-                        <td>@parent.Email</td>
-                        <td>@parent.HomeAddress</td>
-                        <td>@parent.Phone</td>
-                        <td>@parent.WorkPhone</td>
-                        <td>@parent.HomePhone</td>
-                        @if (parent.ParentCouple != null)
-                        {
-                            <td>@parent.ParentCouple.Id</td>
-                        }else{
-                            <td>-</td>
-                        }
-                        <td>
-                            <button class="btn btn-warning btn-sm" @onclick="() => EditParent(parent)">
-                                <span>&#9998;</span>
-                            </button>
-                            @if (parent.ParentCouple == null)
-                            {
-                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteParent(parent.Id)">
-                                    <span>&times;</span>
-                                </button>
-                            }
-                        </td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<!-- Parents Table -->
+<ParentTable Parents="parents" EditingParent="editingParent" OnEditParent="EditParent" OnSaveParent="SaveParent" OnCancelEdit="CancelEdit" OnDeleteParent="DeleteParent" />
 
 @if (error != "")
 {
@@ -164,9 +28,9 @@ else
 
 @code {
     private Parent[]? parents;
-    private ParentCouple newParentCouple = new ParentCouple();
     private Parent? editingParent = null;
     private Parent newParent = new Parent();
+    private ParentCouple newParentCouple = new ParentCouple();
     private string error = "";
     private bool isLoading = false;
     private Parent[]? availableParents;
@@ -182,37 +46,23 @@ else
         try
         {
             parents = await Http.GetFromJsonAsync<Parent[]>("https://localhost:7081/api/parents");
+            availableParents = parents.Where(p => p.ParentCouple == null).ToArray();
         }
         catch (Exception e)
         {
             error = e.Message;
         }
         isLoading = false;
-        availableParents = parents.Where(el => el.ParentCouple == null).ToArray();
     }
 
-    private async Task CreateParent()
+    private async Task HandleParentCreated()
     {
-        isLoading = true;
-        try
-        {
-            var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parents", newParent);
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadParents();
-                newParent = new Parent();
-                error = "";
-            }
-            else
-            {
-                error = response.StatusCode.ToString();
-            }
-        }
-        catch (Exception e)
-        {
-            error = e.Message;
-        }
-        isLoading = false;
+        await LoadParents();
+    }
+
+    private async Task HandleParentCoupleCreated()
+    {
+        await LoadParents();
     }
 
     private async Task DeleteParent(int id)
@@ -284,34 +134,5 @@ else
     private void CancelEdit()
     {
         editingParent = null;
-    }
-    private async Task CreateParentCouple()
-    {
-        isLoading = true;
-        if(newParentCouple.Parent1Id == newParentCouple.Parent2Id)
-        {
-            error = "Select distinct parents";
-            isLoading = false;
-            return;
-        }
-        try
-        {
-            var response = await Http.PostAsJsonAsync("https://localhost:7081/api/parentcouples", newParentCouple);
-            if (response.IsSuccessStatusCode)
-            {
-                newParentCouple = new ParentCouple();
-                await LoadParents(); // Reload parents to reflect any changes
-                error = "";
-            }
-            else
-            {
-                error = response.StatusCode.ToString();
-            }
-        }
-        catch (Exception e)
-        {
-            error = e.Message;
-        }
-        isLoading = false;
     }
 }
