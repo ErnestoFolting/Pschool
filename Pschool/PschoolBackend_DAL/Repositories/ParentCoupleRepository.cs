@@ -19,5 +19,15 @@ namespace PschoolBackend_DAL.Repositories
         {
             await _context.Set<ParentCouple>().AddAsync(parentCoupleToAdd);
         }
+
+        public async Task Delete(ParentCouple parentCoupleToDelete)
+        {
+            _context.Set<ParentCouple>().Remove(parentCoupleToDelete);
+        }
+
+        public async Task<ParentCouple?> GetById(int parentCoupleId)
+        {
+            return await _context.Set<ParentCouple>().FirstOrDefaultAsync(el => el.Id == parentCoupleId);
+        }
     }
 }

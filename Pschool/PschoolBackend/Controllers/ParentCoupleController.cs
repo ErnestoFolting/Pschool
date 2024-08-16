@@ -28,5 +28,12 @@ namespace PschoolBackend.Controllers
             await _parentCoupleService.addParentCouple(parentCoupleToAdd);
             return Ok();
         }
+
+        [HttpDelete("{parentCoupleId}")]
+        public async Task<ActionResult> Delete(int parentCoupleId)
+        {
+            await _parentCoupleService.deleteParentCouple(parentCoupleId);
+            return Ok();
+        }
     }
 }
