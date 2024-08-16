@@ -3,13 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolFrontend", "PschoolFrontend\PschoolFrontend.csproj", "{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PschoolFrontend", "PschoolFrontend\PschoolFrontend.csproj", "{85013FF1-1A72-4BC1-8ABA-5DD7F34A6303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolBackend", "PschoolBackend\PschoolBackend.csproj", "{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PschoolBackend", "PschoolBackend\PschoolBackend.csproj", "{355DC6F2-6A92-4D28-AE7C-721DC1CFF341}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolBackend_BLL", "PschoolBackend_BLL\PschoolBackend_BLL.csproj", "{A87DAA93-C7C8-4232-B090-E2A360C59ED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PschoolBackend_BLL", "PschoolBackend_BLL\PschoolBackend_BLL.csproj", "{A87DAA93-C7C8-4232-B090-E2A360C59ED8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B892C9E3-CD84-438D-8618-DAA1321F0662} = {B892C9E3-CD84-438D-8618-DAA1321F0662}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PschoolBackend_DAL", "PschoolBackend_DAL\PschoolBackend_DAL.csproj", "{B892C9E3-CD84-438D-8618-DAA1321F0662}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PschoolBackend_DAL", "PschoolBackend_DAL\PschoolBackend_DAL.csproj", "{B892C9E3-CD84-438D-8618-DAA1321F0662}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

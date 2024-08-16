@@ -1,5 +1,11 @@
 global using Microsoft.EntityFrameworkCore;
+using PschoolBackend.Middlewares;
+using PschoolBackend_BLL.DTOs.MappingProfiles;
+using PschoolBackend_BLL.Services;
+using PschoolBackend_BLL.Services.Interfaces;
 using PschoolBackend_DAL;
+using PschoolBackend_DAL.Interfaces;
+using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,10 +27,15 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(StudentProfile)), Assembly.GetAssembly(typeof(ParentProfile)));
 
 var app = builder.Build();
 
@@ -38,6 +49,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.MapControllers();
 

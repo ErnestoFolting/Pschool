@@ -2,7 +2,7 @@
 
 namespace PschoolBackend_BLL.Services
 {
-    internal class ParentService : IParentService
+    public class ParentService : IParentService
     {
     }
 }
