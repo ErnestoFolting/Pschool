@@ -13,6 +13,32 @@
 <!-- Create New Parent Couple -->
 <CreateParentCoupleForm AvailableParents="availableParents" OnParentCoupleCreated="HandleParentCoupleCreated" />
 
+<!-- Delete Parent Couple -->
+<div class="card p-3 my-4">
+    <h4>Delete Parent Couple</h4>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <select @bind="selectedParentCoupleId" class="form-control">
+                <option value="">Select Parent Couple</option>
+                @if (parentCouples != null)
+                {
+                    @foreach (var couple in parentCouples)
+                    {
+                        <option value="@couple.Id">@couple.FamilyName (Parent1: @couple.Parent1Id, Parent2: @couple.Parent2Id)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-danger w-100" @onclick="DeleteParentCouple">Delete</button>
+        </div>
+    </div>
+    @if (deleteError != "")
+    {
+        <h3 style="color:darkred">Error: @deleteError</h3>
+    }
+</div>
+
 <!-- Parents Table -->
 <ParentTable Parents="parents" EditingParent="editingParent" OnEditParent="EditParent" OnSaveParent="SaveParent" OnCancelEdit="CancelEdit" OnDeleteParent="DeleteParent" />
 
@@ -28,16 +54,18 @@
 
 @code {
     private Parent[]? parents;
+    private ParentCouple[]? parentCouples;
+    private int? selectedParentCoupleId;
     private Parent? editingParent = null;
-    private Parent newParent = new Parent();
-    private ParentCouple newParentCouple = new ParentCouple();
     private string error = "";
     private bool isLoading = false;
+    private string deleteError = "";
     private Parent[]? availableParents;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadParents();
+        await LoadParentCouples();
     }
 
     private async Task LoadParents()
@@ -55,14 +83,30 @@
         isLoading = false;
     }
 
+    private async Task LoadParentCouples()
+    {
+        isLoading = true;
+        try
+        {
+            parentCouples = await Http.GetFromJsonAsync<ParentCouple[]>("https://localhost:7081/api/parentcouples");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        isLoading = false;
+    }
+
     private async Task HandleParentCreated()
     {
         await LoadParents();
+        await LoadParentCouples();
     }
 
     private async Task HandleParentCoupleCreated()
     {
         await LoadParents();
+        await LoadParentCouples();
     }
 
     private async Task DeleteParent(int id)
@@ -91,18 +135,18 @@
     private void EditParent(Parent parent)
     {
         editingParent = new Parent
-        {
-            Id = parent.Id,
-            FirstName = parent.FirstName,
-            LastName = parent.LastName,
-            Username = parent.Username,
-            Email = parent.Email,
-            HomeAddress = parent.HomeAddress,
-            Phone = parent.Phone,
-            WorkPhone = parent.WorkPhone,
-            HomePhone = parent.HomePhone,
-            ParentCouple = parent.ParentCouple
-        };
+            {
+                Id = parent.Id,
+                FirstName = parent.FirstName,
+                LastName = parent.LastName,
+                Username = parent.Username,
+                Email = parent.Email,
+                HomeAddress = parent.HomeAddress,
+                Phone = parent.Phone,
+                WorkPhone = parent.WorkPhone,
+                HomePhone = parent.HomePhone,
+                ParentCouple = parent.ParentCouple
+            };
     }
 
     private async Task SaveParent()
@@ -134,5 +178,35 @@
     private void CancelEdit()
     {
         editingParent = null;
+    }
+
+    private async Task DeleteParentCouple()
+    {
+        if (!selectedParentCoupleId.HasValue)
+        {
+            deleteError = "Please select a parent couple.";
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            var response = await Http.DeleteAsync($"https://localhost:7081/api/parentcouples/{selectedParentCoupleId.Value}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadParentCouples();
+                await LoadParents(); // Refresh parents list after deleting the parent couple
+                deleteError = "";
+            }
+            else
+            {
+                deleteError = response.StatusCode.ToString();
+            }
+        }
+        catch (Exception e)
+        {
+            deleteError = e.Message;
+        }
+        isLoading = false;
     }
 }
