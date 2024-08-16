@@ -28,10 +28,10 @@ namespace PschoolBackend.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Update([FromForm] ParentRedoDTO updateData)
+        [HttpPut("{parentId}")]
+        public async Task<ActionResult> Update(ParentRedoDTO updateData, int parentId)
         {
-            await _parentService.updateParent(updateData);
+            await _parentService.updateParent(updateData, parentId);
             return Ok();
         }
 

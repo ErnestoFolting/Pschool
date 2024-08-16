@@ -33,9 +33,9 @@ namespace PschoolBackend_BLL.Services
             return parents;
         }
 
-        public async Task<int> updateParent(ParentRedoDTO updateData)
+        public async Task<int> updateParent(ParentRedoDTO updateData, int parentId)
         {
-            var parentInDb = await _unitOfWork.ParentRepository.GetById(updateData.Id);
+            var parentInDb = await _unitOfWork.ParentRepository.GetById(parentId);
             if (parentInDb == null) throw new KeyNotFoundException("Parent not found.");
 
             parentInDb = _mapper.Map(updateData, parentInDb);

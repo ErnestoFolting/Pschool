@@ -45,11 +45,11 @@
     <h4>Create New Parent Couple</h4>
     <div class="row g-3">
         <div class="col-md-3">
-            <input @bind="newParentCouple.FamilyName" class="form-control" placeholder="Family Name" />
+            <input @bind="newParentCouple.FamilyName" class="form-control" placeholder="Family name" />
         </div>
         <div class="col-md-3">
             <select @bind="newParentCouple.Parent1Id" class="form-control">
-                <option value="">Select Parent 1</option>
+                <option value="">Select free parent</option>
                 @if (availableParents != null)
                 {
                     @foreach (var parent in availableParents)
@@ -61,7 +61,7 @@
         </div>
         <div class="col-md-3">
             <select @bind="newParentCouple.Parent2Id" class="form-control">
-                <option value="">Select Parent 2</option>
+                <option value="">Select free parent</option>
                 @if (availableParents != null)
                 {
                     @foreach (var parent in availableParents)
@@ -109,6 +109,10 @@ else
                         <td><input @bind="editingParent.LastName" class="form-control" /></td>
                         <td><input @bind="editingParent.Username" class="form-control" /></td>
                         <td><input @bind="editingParent.Email" class="form-control" type="email" /></td>
+                        <td><input @bind="editingParent.HomeAddress" class="form-control" /></td>
+                        <td><input @bind="editingParent.Phone" class="form-control" /></td>
+                        <td><input @bind="editingParent.WorkPhone" class="form-control" /></td>
+                        <td><input @bind="editingParent.HomePhone" class="form-control" /></td>
                         <td>
                             <button class="btn btn-success btn-sm" @onclick="SaveParent">Save</button>
                             <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
@@ -246,7 +250,8 @@ else
             HomeAddress = parent.HomeAddress,
             Phone = parent.Phone,
             WorkPhone = parent.WorkPhone,
-            HomePhone = parent.HomePhone
+            HomePhone = parent.HomePhone,
+            ParentCouple = parent.ParentCouple
         };
     }
 
