@@ -27,9 +27,9 @@ namespace PschoolBackend_BLL.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<Parent>> getParents()
+        public async Task<List<ParentDTO>> getParents()
         {
-            var parents = await _unitOfWork.ParentRepository.GetAll();
+            var parents = _mapper.Map<List<ParentDTO>>(await _unitOfWork.ParentRepository.GetAll());
             return parents;
         }
 

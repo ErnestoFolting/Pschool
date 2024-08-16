@@ -7,7 +7,7 @@ namespace PschoolBackend_BLL.Services.Interfaces
     {
         Task addParent(ParentDTO parentToAdd);
         Task deleteParent(int parentId);
-        public Task<List<Parent>> getParents();
+        public Task<List<ParentDTO>> getParents();
         Task<int> updateParent(ParentRedoDTO updateData);
     }
 }

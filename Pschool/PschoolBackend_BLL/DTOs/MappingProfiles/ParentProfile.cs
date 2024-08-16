@@ -7,8 +7,10 @@ namespace PschoolBackend_BLL.DTOs.MappingProfiles
     {
         public ParentProfile()
         {
+            CreateMap<Parent, ParentDTO>()
+                .ForMember(dest => dest.ParentCouple, opt => opt.MapFrom(src => src.ParentCoupleFromParent1 ?? src.ParentCoupleFromParent2));
+
             CreateMap<ParentDTO, Parent>();
-            CreateMap<Parent, ParentDTO>();
         }
     }
 }

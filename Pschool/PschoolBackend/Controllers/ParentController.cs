@@ -16,13 +16,13 @@ namespace PschoolBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Parent>> Get()
+        public async Task<IEnumerable<ParentDTO>> Get()
         {
             return await _parentService.getParents();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromForm] ParentDTO parentToAdd)
+        public async Task<ActionResult> Post(ParentDTO parentToAdd)
         {
             await _parentService.addParent(parentToAdd);
             return Ok();

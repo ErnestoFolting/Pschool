@@ -13,7 +13,7 @@ namespace PschoolBackend_DAL.Repositories
         }
         public async Task<List<Parent>> GetAll()
         {
-            return await _context.Set<Parent>().ToListAsync();
+            return await _context.Set<Parent>().Include(p=>p.ParentCoupleFromParent1).Include(p=>p.ParentCoupleFromParent2).ToListAsync();
         }
 
         public async Task Add(Parent parentToAdd)
